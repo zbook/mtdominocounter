@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Scanner</title>
+    <style>
+      body
+      {
+        text-align: left;
+        margin-top: 0;
+      }
+      #headerdiv
+      {
+        /* display: inline-block; */
+      }
+      table
+      {
+        display: inline;
+        /* margin: 0 auto; */
+      }
+      input
+      {
+        background-color: yellow;
+        /* font-size: 110%; */
+        width: 7vw;
+        text-align: center;
+      }
+      input:focus
+      {
+        border: 2px solid black;
+        background-color: white;
+      }
+      textarea:focus 
+      {
+        border: 2px solid black;
+        background-color: white;
+      }
+      #scanningtable
+      {
+        width: 50%;
+        /* float:left; */
+      }
+      #gamescorestable
+      {
+        text-align: center;
+      }
+      .button
+      {
+        background-color: cyan;
+        /* font-size: 110%; */
+        border-radius: 5px;
+        box-shadow: 2px 2px red;
+        width: 10vw;
+      }
+      .totalsrow
+      {
+        margin: 2px 0 2px 0;
+      }
+      .headerrow
+      {
+        margin: 5px 0 2px 0;
+        color: red;
+      }
+      .btns_players
+      {
+        color: green;
+        margin: 5px 0 5px 0;
+      }
+      .btns_game
+      {
+        color: brown;
+        margin: 2vw 0 2vw 0;
+        width: 15vw;
+      }
+      .infoheader
+      {
+        text-align: center;
+        color: red;
+      }
+      #gamescorestable td
+      {
+        border: 1px solid gray;
+        border-collapse: collapse;
+      }
+      .inps_playerroundtotal
+      {
+        color: green;
+      }
+      .inps_playergametotals
+      {
+        color: blue;
+      }
+      #p_scannedtotal
+      {
+        font-size: 4vw;
+        color: red;
+      }
+      #span_roundnumlabel
+      {
+        margin-left: 3vw;
+      }
+      #span_gamelimitlabel
+      {
+        margin-left: 2vw;
+      }
+      #span_roundnum
+      {
+        border: 1px solid green;
+        margin-right: 2vw;
+        padding-left: 2vw;
+        padding-right: 2vw;
+        font-weight: bolder;
+      }
+      #inp_scannedtext
+      {
+        width: 30%;
+        text-align: right;
+      }
+      #settingstable
+      {
+        text-align: left;
+      }
+      #settingstable textarea
+      {
+        text-align: left;
+        background-color: yellow;
+      }
+      #p_settingstableheader
+      {
+        text-align: center;
+        color: red;
+      }
+
+    </style>
+  </head>
+  <body>
+      
+    <div id="headerdiv">
+      <!-- <button id="btn_showsettings" class="button btns_game" type="button" onclick="abzgame.showSettings()" value="Settings"></button> -->
+      <!-- <br> -->
+      <button id="btn_startnewgame" class="button btns_game" type="button" onclick="abzgame.startNewGame()">start new game</button>
+    
+      <span id="span_gamelimitlabel" class="infoheader">game limit</span>     
+      <select id="sel_gamelimit" class="infoheader" onchange="abzgame.setGameLimit(this)" required>
+        <option value="50">50</option>
+        <option value="100">100</option>
+        <option value="150">150</option>
+        <option value="200">200</option>
+        <option value="250" selected>250</option>
+        <option value="300">300</option>
+        <option value="350">350</option>
+        <option value="400">400</option>
+        <option value="450">450</option>
+        <option value="500">500</option>
+      </select>
+      <br>
+      <span id="span_roundnumlabel" class="infoheader">round #</span>     
+      <span id="span_roundnum" class="infoheader">double</span>
+      <textarea rows="1" cols="6" id="inp_roundstartingdouble" class="infoheader" readonly>double</textarea>
+
+      <button id="btn_roundnum" class="button btns_game" type="button" onclick="abzgame.startNewRound()">start new round</button>
+    </div>
+
+    <label for="inp_scannedtext" style="color:red;">scanned: </label>
+    <textarea rows="1" cols="6"  id="inp_scannedtext" class="infoheader"></textarea>&nbsp&nbsp=&nbsp&nbsp 
+    <textarea rows="1" cols="6"  id="inp_scannedtotal" class="infoheader" type="text"></textarea>
+    <button id="btn_announcescores" class="button btns_game" type="button" onclick="abzgame.announceScores()">announce scores</button>
+    <br>
+    <table id="scanningtable">
+      <tr>
+        <td><button id="btn_donecounting" class="button btns_game" type="button" onclick="abzgame.showRoundScoresInGameTable()">done counting</button></td>
+        <td style="text-align: center; color:red;">hand</td>
+        <td style="text-align: center; color:red;">round</td>
+      </tr>
+       <tr>
+        <td><button id="btn_player00" class="button btns_players" type="button" autofocus onclick="abzgame.selectPlayer(0)">Player 1</button></td>
+        <td><input id="inp_player00" class="inps_players" type="text" onchange="abzgame.addToScore(0)" onfocusout="abzgame.saveRoundScore(0)" onkeydown="abzgame.captureKeyDown(event, 0)"/></td>
+        <td><input id="inp_player00roundtotal" class="inps_playerroundtotals" type="text" /></td>
+      </tr>
+      <tr>
+        <td><button id="btn_player01" class="button btns_players" type="button" autofocus onclick="abzgame.selectPlayer(1)">Player 2</button></td>
+        <td><input id="inp_player01" class="inps_players" type="text" onchange="abzgame.addToScore(1)" onblur="abzgame.saveRoundScore(1)" onkeydown="abzgame.captureKeyDown(event, 1)"/></td>
+        <td><input id="inp_player01roundtotal" class="inps_playerroundtotals" type="text" /></td>
+      </tr>
+      <tr>
+        <td><button id="btn_player02" class="button btns_players" type="button" autofocus onclick="abzgame.selectPlayer(2)">Player 3</button></td>
+        <td><input id="inp_player02" class="inps_players" type="text" onchange="abzgame.addToScore(2)" onblur="abzgame.saveRoundScore(2)" onkeydown="abzgame.captureKeyDown(event, 2)"/></td>
+        <td><input id="inp_player02roundtotal" class="inps_playerroundtotals" type="text" /></td>
+      </tr>
+      <tr>
+        <td><button id="btn_player03" class="button btns_players" type="button" autofocus onclick="abzgame.selectPlayer(3)">Player 4</button></td>
+        <td><input id="inp_player03" class="inps_players" type="text" onchange="abzgame.addToScore(3)"  onblur="abzgame.saveRoundScore(3)" onkeydown="abzgame.captureKeyDown(event, 3)"/></td>
+        <td><input id="inp_player03roundtotal" class="inps_playerroundtotals" type="text" /></td>
+      </tr>
+      <tr>
+        <td><button id="btn_player04" class="button btns_players" type="button" autofocus onclick="abzgame.selectPlayer(4)">Player 5</button></td>
+        <td><input id="inp_player04" class="inps_players" type="text" onchange="abzgame.addToScore(4)"  onblur="abzgame.saveRoundScore(4)" onkeydown="abzgame.captureKeyDown(event, 4)"/></td>
+        <td><input id="inp_player04roundtotal" class="inps_playerroundtotals" type="text" /></td>
+      </tr>
+      <tr>
+        <td><button id="btn_player05" class="button btns_players" type="button" autofocus onclick="abzgame.selectPlayer(5)">Player 6</button></td>
+        <td><input id="inp_player05" class="inps_players" type="text" onchange="abzgame.addToScore(5)" onblur="abzgame.saveRoundScore(5)" onkeydown="abzgame.captureKeyDown(event, 5)"/></td>
+        <td><input id="inp_player05roundtotal" class="inps_playerroundtotals" type="text" /></td>
+      </tr>
+    </table>
+  
+    <table id="gamescorestable"></table>
+
+    </table>
+    <p id="p_settingstableheader">SETTINGS</p>
+    <table id="settingstable">
+      <tr>
+        <td>Player Names</td>
+        <td>
+          <textarea id="settingsplayer00" rows="1" cols="10" placeholder="player 1" onblur="abzgame.addPlayerName(0)" onchange="abzgame.setPlayerName(this)" value="Tobie"></textarea>
+          <textarea id="settingsplayer01" rows="1" cols="10" placeholder="player 2" onblur="abzgame.addPlayerName(1)" onchange="abzgame.setPlayerName(this)" value="Robbie"></textarea>
+          <textarea id="settingsplayer02" rows="1" cols="10" placeholder="player 3" onblur="abzgame.addPlayerName(2)" onchange="abzgame.setPlayerName(this)" value="David"></textarea>
+          <textarea id="settingsplayer03" rows="1" cols="10" placeholder="player 4" onblur="abzgame.addPlayerName(3)" onchange="abzgame.setPlayerName(this)" value="Richard"></textarea>
+          <textarea id="settingsplayer04" rows="1" cols="10" placeholder="player 5" onblur="abzgame.addPlayerName(4)" onchange="abzgame.setPlayerName(this)" value=""></textarea>
+          <textarea id="settingsplayer05" rows="1" cols="10" placeholder="player 6" onblur="abzgame.addPlayerName(5)" 
+            onchange="abzgame.setPlayerName(this)" value=""></textarea>        
+        </td>
+      <tr>
+        <td>Voice Type</td>
+        <td>
+          <select id="sel_voicetype" onchange="abzgame.setVoiceType(this)"></select>
+        </td>     
+      </tr>
+      <tr>
+        <td>Voice Volume</td>
+        <td>
+          <select id="sel_voicevolume" onchange="abzgame.setVoiceVolume(this)">
+            <option value="0.5">0.5</option>
+            <option value="1.0" selected>1.0</option>
+            <option value="1.5">1.5</option>
+            <option value="2.0">2.0</option>
+          </select>
+        </td>     
+      </tr>
+      <tr>
+        <td>Voice Speed</td>
+        <td>
+            <select id="sel_voicespeed" onchange="abzgame.setVoiceSpeed(this)">
+            <option value="0.75" selected>0.75</option>
+            <option value="0.80">0.80</option>
+            <option value="0.85">0.85</option>
+            <option value="0.90">0.90</option>
+            <option value="0.95">0.95</option>
+            <option value="1.00">1.00</option>
+            <option value="1.25">1.25</option>
+            <option value="1.50">1.50</option>
+            <option value="1.75">1.75</option>
+            <option value="2.00">2.00</option>
+            <option value="2.25">2.25</option>
+            <option value="2.50">2.50</option>
+          </select>          
+        </td>
+      </tr>
+      <tr>
+        <td>Voice Pitch</td>
+        <td>
+          <select id="sel_voicepitch" onchange="abzgame.setVoicePitch(this)">
+            <option value="0.5">0.5</option>
+            <option value="1.0" selected>1.0</option>
+            <option value="1.5">1.5</option>
+            <option value="2.0">2.0</option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td>Blank Tile Value</td>
+        <td>
+          <select id="sel_blanktileworth" onchange="abzgame.setBlankTileWorth(this)">
+            <option value="0" selected>0</option>
+            <option value="50">50</option>
+          </select>
+        </td>      
+      </tr>
+      <tr>
+        <td>Tile Set</td>
+        <td>
+          <select id="sel_tileset" onchange="abzgame.setTileSet(this)">
+            <option value="6">6</option>
+            <option value="9">9</option>
+            <option value="12" selected>12</option>
+          </select>
+        </td>
+      </tr>
+    </table>
+
+    <br>
+
+    <script>
+    "use strict";
+
+    class ABZD1129Game 
+    {
+      constructor() 
+      {
+        this.tracing = true;
+        this.wehavelocalstorage = false;
+
+        this.synth = speechSynthesis;
+        this.available_voices = [];
+        this.active_voice = "";
+        if (this.synth.onvoiceschanged !== undefined) 
+        {
+          this.synth.onvoiceschanged = this.populateVoicesList();
+        }
+        this.loserphrase = [];
+        this.loserphrase.push(" lou ooh ooh ooh ooh ooh ooh ser ");
+        this.loserphrase.push(" better luck next time ");
+        this.loserphrase.push(" we can't all be winners ");
+        this.loserphrase.push(" without losers, there would be no winners ");
+        this.loserphrase.push(" keep at it, you'll win one of these old days ");
+        this.loserphrase.push(" repeat after me, I can win, I can win, I can win ");
+        this.loserphrase.push(" nobody is cheating, you just lost fair and square ");
+        this.winnerphrase = [];
+        this.winnerphrase.push(" congratulations ");
+        this.winnerphrase.push(" go go go go winner ");
+        this.winnerphrase.push(" that's what I'm talking about ");
+        this.winnerphrase.push(" show us how it's done why don't ya ");
+        this.winnerphrase.push(" you're the best ");
+        this.winnerphrase.push(" I knew you could do it ");
+        this.winnerphrase.push(" You make it look so E E E E E E E E E E E E E EASY ");
+        this.tobiewinnerphrases = [];
+        this.tobiewinnerphrases.push(" I always win, that's what I mean. You will all bow down to the Queen ");
+        this.tobieloserphrases = [];
+        this.tobieloserphrases.push(" So beating me down is really sweet, just waiting for you all to go to sleep ");
+        this.robbiewinnerphrases = [];
+        this.robbiewinnerphrases.push(" Robbie, Robbie, Robbie Lee. You are the person I want to be ");
+        this.robbieloserphrases = [];
+        this.robbieloserphrases.push(" You lost again, man I swear. Go braid the hair of a big fat bear ");
+        this.davidwinnerphrases = [];
+        this.davidwinnerphrases.push(" Winning every game is my order. Sending Robbie, Richard and Tobie back to the border ");
+        this.davidloserphrases = [];
+        this.davidloserphrases.push(" Living in the woods chopping logs. Get off my team, you suck head dog ");
+        this.richardwinnerphrases = [];
+        this.richardwinnerphrases.push(" Winning this game is really fun. Just need some players that are smarter than dumb ");
+        this.richardloserphrases = [];
+        this.richardloserphrases.push(" You are a loser. Man what a shame. Kicking squirrels should be your game ");
+        // console.log(this.tobiewinnerphrases);
+        // console.log(this.robbiewinnerphrases);
+        // console.log(this.davidwinnerphrases);
+        // console.log(this.richardwinnerphrases);
+        // console.log(this.tobieloserphrases);
+        // console.log(this.robbieloserphrases);
+        // console.log(this.davidloserphrases);
+        // console.log(this.richardloserphrases);
+        this.gameover = false;
+        this.ar_tilesused = [];
+        this.createTileSetArray();
+        this.inp_roundstartingdouble = document.getElementById("inp_roundstartingdouble");
+        this.inp_scannedtext = document.getElementById("inp_scannedtext");
+        this.inp_scannedtotal = document.getElementById("inp_scannedtotal");
+        this.scannedtotal = 0;
+
+        this.sel_voicetype = document.getElementById("sel_voicetype");
+        this.voicetype = this.getElementStateFromLocalStorage( document.getElementById("sel_voicetype"));
+        
+        this.voicevolume = this.getElementStateFromLocalStorage( document.getElementById("sel_voicevolume"));
+        
+        this.voicepitch = this.getElementStateFromLocalStorage( document.getElementById("sel_voicepitch"));
+        
+        this.voicespeed = this.getElementStateFromLocalStorage( document.getElementById("sel_voicespeed"));
+
+        this.sel_gamelimit = document.getElementById("sel_gamelimit");
+        this.gamelimit = this.getElementStateFromLocalStorage( document.getElementById("sel_gamelimit"));
+
+        this.sel_blanktileworth = document.getElementById("sel_blanktileworth");
+        this.blanktileworth = this.getElementStateFromLocalStorage( document.getElementById("sel_blanktileworth"));
+
+        this.sel_tileset = document.getElementById("sel_tileset");
+        this.tileset = this.getElementStateFromLocalStorage( document.getElementById("sel_tileset"));
+
+
+        this.span_roundnum = document.getElementById("span_roundnum");
+        this.btn_roundnum = document.getElementById("btn_roundnum");
+        this.roundnum = 0;
+        this.gamescorestable = document.getElementById("gamescorestable");
+        this.playercount = 0;
+        this.activeplayer = 99;
+        this.createSettingsPlayerNamesArray(); 
+        this.createPlayerButtonsArray();
+        this.createPlayerInputsArray(); 
+        this.createPlayerRoundTotalsInputsArray();
+        this.ar_playergametotals = [];
+        //rounds history table
+        this.ar_roundshistory = [];
+        this.roundshistoryindex = 0;
+       
+      } // end Game constructor
+
+      addPlayerName(playernum) 
+      {
+        if (this.tracing) console.log("addPlayerName(playernum == " + playernum + ")");
+
+        if (this.ar_settingsplayernames[playernum].value == "") return;
+          
+        this.ar_playerbuttons[playernum].value = this.ar_settingsplayernames[playernum].value;
+        this.ar_playerbuttons[playernum].innerText = this.ar_settingsplayernames[playernum].value;
+
+        this.playercount = 0;
+
+        for (let i = 0; i < this.ar_settingsplayernames.length; i++)
+        {
+          if (this.ar_settingsplayernames[i].value == "") continue;
+          this.playercount++;
+        }
+      } // end addPlayerName()
+
+      addRowToRoundsHistory() 
+      {
+        if (this.tracing) console.log("addRowToRoundsHistory()");
+
+        if (this.ar_roundshistory.length < this.roundnum)
+        {
+          this.ar_roundshistory.push([0,0,0,0,this.roundnum]);        
+        }
+      } // end addRowToRoundsHistory()
+      
+      addToScore(playernum) 
+      {
+        if (this.tracing) console.log("addToScore(" + playernum + ")");
+
+        let scannedtext = this.ar_playerinputs[playernum].value;
+        scannedtext = scannedtext.replace(/:/g, "");
+
+        this.ar_playerinputs[playernum].value = "";
+
+        switch (scannedtext)
+        {
+          case "PLAYER1": this.selectPlayer(0); return false; break;
+          case "PLAYER2": this.selectPlayer(1); return false; break;
+          case "PLAYER3": this.selectPlayer(2); return false; break;
+          case "PLAYER4": this.selectPlayer(3); return false; break;
+          case "PLAYER5": this.selectPlayer(4); return false; break;
+          case "PLAYER6": this.selectPlayer(5); return false; break;
+          case "BLANK": this.textToSpeech("BLANK"); return false; break;
+          case "NEW ROUND": this.textToSpeech("NEW ROUND"); return false; break;
+          case "NEW GAME": this.textToSpeech("NEW GAME"); return false; break;
+          case "NEWRUOND": this.textToSpeech("NEW ROUND"); return false; break;
+          case "DOUBLE": this.textToSpeech("STARTING DOUBLE"); return false; break;
+          case "NEWGAME": this.textToSpeech("NEW GAME"); return false; break;
+          case "COUNT": this.textToSpeech("COUNT"); return false; break;
+          case "00": this.announceOnePlayersRoundScore(playernum); return false; break;
+          case "XXXX": scannedtext = "0000"; break;
+        }
+        if (!Number(scannedtext))
+        {
+          this.ar_playerinputs[playernum].value = "";
+          this.textToSpeech("only numbers allowed");
+          return false;
+        } 
+        if (scannedtext.length == 4)
+        {
+          let tilevalue = Number(scannedtext.substr(0,2));
+          let rightside = Number(scannedtext.substr(2,2));
+          let leftside = tilevalue - rightside;
+          // alert("leftside= " + leftside + " rightside= " + rightside + " tilevalue= " + tilevalue);
+          /*
+          VALIDATE THAT THIS TILE HAS NOT ALREADY BEEN SCANNED FOR THIS ROUND
+          */
+          if (this.ar_tilesused.includes(scannedtext))
+          {
+            this.ar_playerinputs[playernum].value = "";
+            this.textToSpeech(leftside + " by " + rightside + " has already been scanned for this round");
+            return false;
+          }
+          this.ar_tilesused.push(scannedtext);
+          /*
+          the scanned barcode is formatted as follows:
+          left 2 digits = total value of the tile
+          right 2 digits = the value of just one side of the tile
+          */
+
+          scannedtext = tilevalue.toString();
+        }
+        this.textToSpeech(scannedtext);
+        if (this.inp_scannedtext.value == "")
+        {
+          this.inp_scannedtext.value = scannedtext; 
+        }
+        else
+        {
+          this.inp_scannedtext.value += " + " + scannedtext; 
+        }
+        this.scannedtotal += Number(scannedtext);
+        this.inp_scannedtotal.value = this.scannedtotal;
+        this.ar_playerinputs[playernum].value = "";
+        this.ar_playerroundtotalsinputs[playernum].value = this.scannedtotal;
+      } // end addToScore()
+
+      announceOnePlayersRoundScore(playernum) 
+      {
+        if (this.tracing) console.log("announceOnePlayersRoundScore(" + playernum + ")");
+
+        this.textToSpeech(this.ar_playerbuttons[playernum].value + " has " + this.ar_playerroundtotalsinputs[playernum].value);      
+      } // end announceOnePlayersRoundScore()
+
+      announceScores() 
+      {
+        if (this.tracing) console.log("announceScores()");
+
+        if (this.ar_playergametotals.length <= 0)
+        {
+          this.textToSpeech("There are no scores yet.");
+          return;
+        }
+        for (let t = 0; t < this.playercount; t++)
+        {
+          this.textToSpeech(this.ar_playerbuttons[t].value + " has " + this.ar_playergametotals[t]);
+        }
+      } // end announceScores()
+
+      areWeRecounting(playernum) 
+      {
+        if (this.tracing) console.log("areWeRecounting(playernum == " + playernum + ")");
+
+        let recounting = confirm("Are we recounting this round for " + this.ar_playerbuttons[playernum].value);
+        if (!recounting)
+        {
+          // alert("We should NOT recount this round for " + this.ar_playerbuttons[playernum].value);
+          this.inp_scannedtotal.focus();
+          return false;
+        }
+        return true;
+      } // end areWeRecounting()
+      
+      captureKeyDown(evt, playernum) 
+      {
+        if (this.tracing) console.log("captureKeyDown(playernum == " + playernum + ")");
+
+        let kp = evt.which || evt.keyCode;
+        // alert("you pressed the " + kp + " key for playernum == " + playernum);
+        if (kp == 13) 
+        {
+          evt.preventDefault();
+          this.addToScore(playernum);
+          return true;
+        }
+        if (kp != 9) 
+        {
+          return true;
+        }
+        let nextplayer = 0;
+        if (playernum == this.playercount - 1)
+        {
+          nextplayer = 0;
+        }
+        else
+        {
+          nextplayer = playernum + 1;
+        }
+        if (kp == 9) 
+        {
+          evt.preventDefault();
+          this.selectPlayer(nextplayer);
+          this.ar_playerinputs[nextplayer].focus();
+          return false;
+        }
+        return true;
+      } // end captureKeyDown()
+
+      createPlayerButtonsArray() 
+      {
+        if (this.tracing) console.log("createPlayerButtonsArray()");
+
+         //player buttons
+         this.ar_playerbuttons = [];
+        this.ar_playerbuttons.push(document.getElementById("btn_player00"));
+        this.ar_playerbuttons.push(document.getElementById("btn_player01"));
+        this.ar_playerbuttons.push(document.getElementById("btn_player02"));
+        this.ar_playerbuttons.push(document.getElementById("btn_player03"));
+        this.ar_playerbuttons.push(document.getElementById("btn_player04"));
+        this.ar_playerbuttons.push(document.getElementById("btn_player05"));
+
+        this.ar_playerbuttons[0].innerText = document.getElementById("settingsplayer00").value;
+        this.ar_playerbuttons[1].innerText = document.getElementById("settingsplayer01").value;
+        this.ar_playerbuttons[2].innerText = document.getElementById("settingsplayer02").value;
+        this.ar_playerbuttons[3].innerText = document.getElementById("settingsplayer03").value;
+        this.ar_playerbuttons[4].innerText = document.getElementById("settingsplayer04").value;
+        this.ar_playerbuttons[5].innerText = document.getElementById("settingsplayer05").value;
+
+        this.ar_playerbuttons[0].value = document.getElementById("settingsplayer00").value;
+        this.ar_playerbuttons[1].value = document.getElementById("settingsplayer01").value;
+        this.ar_playerbuttons[2].value = document.getElementById("settingsplayer02").value;
+        this.ar_playerbuttons[3].value = document.getElementById("settingsplayer03").value;
+        this.ar_playerbuttons[4].value = document.getElementById("settingsplayer04").value;
+        this.ar_playerbuttons[5].value = document.getElementById("settingsplayer05").value;
+      }
+
+      createPlayerInputsArray() 
+      {
+        if (this.tracing) console.log("createPlayerInputsArray()");
+
+        //player inputs
+        this.ar_playerinputs = [];
+        this.ar_playerinputs.push(document.getElementById("inp_player00"));
+        this.ar_playerinputs.push(document.getElementById("inp_player01"));
+        this.ar_playerinputs.push(document.getElementById("inp_player02"));
+        this.ar_playerinputs.push(document.getElementById("inp_player03"));
+        this.ar_playerinputs.push(document.getElementById("inp_player04"));
+        this.ar_playerinputs.push(document.getElementById("inp_player05"));
+      }
+
+      createPlayerRoundTotalsInputsArray() 
+      {
+        if (this.tracing) console.log("createPlayerRoundTotalsInputsArray()");
+
+        //player round totals
+        this.ar_playerroundtotalsinputs = [];
+        this.ar_playerroundtotalsinputs.push(document.getElementById("inp_player00roundtotal"));
+        this.ar_playerroundtotalsinputs.push(document.getElementById("inp_player01roundtotal"));
+        this.ar_playerroundtotalsinputs.push(document.getElementById("inp_player02roundtotal"));
+        this.ar_playerroundtotalsinputs.push(document.getElementById("inp_player03roundtotal"));
+        this.ar_playerroundtotalsinputs.push(document.getElementById("inp_player04roundtotal"));
+        this.ar_playerroundtotalsinputs.push(document.getElementById("inp_player05roundtotal"));
+      }
+
+      createSettingsPlayerNamesArray() 
+      {
+        if (this.tracing) console.log("createSettingsPlayerNamesArray()");
+
+        // this.getElementStateFromLocalStorage
+
+        this.ar_settingsplayernames = [];
+        this.ar_settingsplayernames.push(document.getElementById("settingsplayer00"));
+        this.ar_settingsplayernames.push(document.getElementById("settingsplayer01"));
+        this.ar_settingsplayernames.push(document.getElementById("settingsplayer02"));
+        this.ar_settingsplayernames.push(document.getElementById("settingsplayer03"));
+        this.ar_settingsplayernames.push(document.getElementById("settingsplayer04"));
+        this.ar_settingsplayernames.push(document.getElementById("settingsplayer05"));
+
+        this.ar_settingsplayernames[0].value = "Tobie";
+        this.ar_settingsplayernames[1].value = "Robbie";
+        this.ar_settingsplayernames[2].value = "David";
+        this.ar_settingsplayernames[3].value = "Richard";
+        // this.ar_settingsplayernames[4].value = "Yvonne";
+        // this.ar_settingsplayernames[5].value = "Raymond";
+
+        for (let i = 0; i < this.ar_settingsplayernames.length; i++)
+        {
+          if (this.ar_settingsplayernames[i].value == "") continue;
+          this.playercount++;
+        }
+      }
+
+      createTileSetArray() 
+      {
+        if (this.tracing) console.log("createTileSetArray()");
+
+        this.ar_tileset = ["1200", "1707", "0402", "0400", "1809", "2311", "0100", "0700", "0200", "1504", "0803", "1306", "1000", "0903", "0801", "1404", "1403", "2008", "0902", "1105", "1004", "0602", "1204", "1607", "0901", "0500", "0300", "2210", "0800", "1407", "1206", "0703", "1205", "1003", "1708", "1102", "1203", "1503", "0201", "1908", "1402", "1907", "1304", "0904", "0501", "1104", "2109", "0603", "1001", "1807", "1303", "0301", "1605", "1302", "1909", "1101", "1506", "1507", "0401", "0600", "1100", "2010", "1706", "2110", "1201", "2009", "1405", "1103", "0802", "1606", "1806", "1301", "1608", "1406", "1604", "0502", "0601", "1305", "0702", "1202", "2211", "0701", "1505", "1002", "0900", "1808", "1705", "2412", "1005", "0804", "0000"];
+      }
+
+      getElementStateFromLocalStorage(el)  
+      {
+        if (this.tracing) console.log("getElementStateFromLocalStorage(" + el.id + ")");
+
+        if (window.abzgamehaslocalstorage)
+        {
+          let lskey = "abzgame1129-" + el.id;
+          let lsvalue = localStorage.getItem(lskey);
+          console.log(lskey + ": " + lsvalue);
+          if (lsvalue != "") 
+          {
+            el.value = lsvalue;
+            return lsvalue;
+          }
+        }
+        return el.value;
+      }
+
+      initializeGameScoresTable() 
+      {
+        if (this.tracing) console.log("initializeGameScoresTable()");
+
+        let trow0 = this.gamescorestable.insertRow(0);
+        trow0.class = "headerrow";
+        let trow1 = this.gamescorestable.insertRow(1);
+        trow1.class=  "totalsrow";
+
+        for (let c = 0; c < this.playercount; c++)
+        {
+          trow0.insertCell(c);
+          trow0.cells[c].innerText = "0";
+          trow1.insertCell(c);
+          trow1.cells[c].innerText = this.ar_playerbuttons[c].value;
+        }
+
+        trow0.insertCell(this.playercount);
+        trow0.cells[this.playercount].innerText = "round#";
+
+        trow1.insertCell(this.playercount);
+
+        while (this.gamescorestable.rows.length > 2)
+        {
+          this.gamescorestable.deleteRow(-1);
+        }
+      }
+
+      initializePlayerGameTotals() 
+      {
+        if (this.tracing) console.log("initializePlayerGameTotals()");
+
+        this.ar_playergametotals = [];
+        for (let m = 0; m < this.playercount; m++)
+        {
+          this.ar_playergametotals.push(0);
+        }
+      }
+
+      populateVoicesList() 
+      {
+        if (this.tracing) console.log("populateVoicesList()");
+
+        this.available_voices = this.synth.getVoices();
+        console.log(this.available_voices);
+
+        this.active_voice = this.available_voices[0];
+        console.log(this.active_voice);
+
+        // find voice by the name property
+        for(let i = 0; i < this.available_voices.length; i++) 
+        {
+          if (this.available_voices[i].lang != "en-US" && this.available_voices[i].lang != "en-GB")
+          {
+            continue;
+          }
+          let option = document.createElement('option');
+          option.textContent = this.available_voices[i].name + ' (' + this.available_voices[i].lang + ')';
+          console.log(option.textContent);
+          if (this.available_voices[i].default) 
+          {
+            option.textContent += ' -- DEFAULT';
+          }
+          option.setAttribute('data-lang', this.available_voices[i].lang);
+          option.setAttribute('data-name', this.available_voices[i].name);
+          option.setAttribute('data-voicenum', i);
+
+          this.sel_voicetype.appendChild(option);
+          if(this.available_voices[i].name == "Google UK English Female") 
+          {
+            this.active_voice = this.available_voices[i];
+            break;
+          }
+          console.log(option);
+        }
+      }
+
+      promptForStartingDouble() 
+      {
+        if (this.tracing) console.log("promptForStartingDouble()");
+
+        /*
+        the scanned barcode is formatted as follows:
+          left 2 digits = total value of the tile
+          right 2 digits = the value of just one side of the tile
+          so, a double-tile is just the right side repeated
+          */
+        let dbltile = prompt("Starting Double?",);
+        dbltile = dbltile.replace(/:/g, "");   
+        let rightside = dbltile.substr(2,2);
+        this.inp_roundstartingdouble.value = rightside + rightside;
+      }
+
+      saveElementStateToLocalStorage(el)  
+      {
+        if (this.tracing) console.log("saveElementStateToLocalStorage(" + el.id + ")");
+
+        if (window.abzgamehaslocalstorage)
+        {
+          let lskey = "abzgame1129-" + el.id;
+          localStorage.setItem(lskey, el.value);
+          console.log("from ls: " + localStorage.getItem(lskey));
+        }
+      }
+
+      saveRoundScore(playernum) 
+      {
+        if (this.tracing) console.log("saveRoundScore(" + playernum + ")");
+
+        this.addRowToRoundsHistory();
+
+        this.ar_roundshistory[this.roundshistoryindex][this.playercount] = 0;
+
+        //save the onblur(playernum) round score
+        this.ar_roundshistory[this.roundshistoryindex][playernum] = this.ar_playerroundtotalsinputs[playernum].value;
+
+        //accumulate and store the grand total scores for the current round
+        let roundgrandtotal = 0;
+        for (let p = 0; p < this.playercount; p++)
+        {
+          roundgrandtotal += Number(this.ar_roundshistory[this.roundshistoryindex][p]);
+        }
+        this.ar_roundshistory[this.roundshistoryindex][this.playercount] = roundgrandtotal;
+
+        this.ar_playerinputs[playernum].value = "";
+        // preserve player's round total in case he wants to scan some more
+        // this.ar_playerroundtotalsinputs[playernum].value = 0;
+        this.inp_scannedtext.value = "";
+        this.inp_scannedtotal.value = 0;
+
+      } // end saveRoundScore()
+      
+      selectPlayer(playernum) 
+      {
+        if (this.tracing) console.log("selectPlayer(" + playernum + ")");
+
+        if (this.span_roundnum.innerText == "")
+        {
+          alert("start a round first");
+          return false;
+        }
+
+        if (this.ar_playerroundtotalsinputs[playernum].value > 0)
+        {
+          if (!this.areWeRecounting(playernum)) return false;
+        }
+
+        switch(playernum) 
+        {
+          case "PLAYER1": playernum = 0; break;
+          case "PLAYER2": playernum = 1; break;
+          case "PLAYER3": playernum = 2; break;
+          case "PLAYER4": playernum = 3; break;
+          case "PLAYER5": playernum = 4; break;
+          case "PLAYER6": playernum = 5; break;
+          default: // code block
+        }
+
+        this.ar_playerinputs[playernum].focus();
+        this.ar_playerinputs[playernum].value = "";
+        this.inp_scannedtext.value = "";
+        this.inp_scannedtotal.value = 0;
+        this.scannedtotal = 0;
+        if (this.ar_playerroundtotalsinputs[playernum].value > 0)
+        {
+          confirm
+        }
+
+        this.textToSpeech(" for " + this.ar_playerbuttons[playernum].value);
+      } // end selectPlayer()
+
+      setBlankTileWorth(el)  
+      {
+        if (this.tracing) console.log("setBlankTileWorth(" + el.id + ")");
+
+        this.blanktilevalue = el.value;
+        this.saveElementStateToLocalStorage(el);
+      }
+
+      setGameLimit(el)  
+      {
+        if (this.tracing) console.log("setGameLimit(" + el.id + ")");
+
+        this.gamelimit = el.value;
+        this.saveElementStateToLocalStorage(el);
+      }
+
+      setPlayerName(el)  
+      {
+        if (this.tracing) console.log("setPlayerName(" + el.id + ")");
+
+        this.saveElementStateToLocalStorage(el);
+      }
+
+      setTileSet(el)  
+      {
+        if (this.tracing) console.log("setTileSet(" + el.id + ")");
+
+        this.tileset = el.value;
+        this.saveElementStateToLocalStorage(el);
+      }
+
+      setVoicePitch(el)  
+      {
+        if (this.tracing) console.log("setVoicePitch(" + el.id + ")");
+
+        this.voicepitch = el.value;
+        this.saveElementStateToLocalStorage(el);
+      }
+
+      setVoiceSpeed(el)  
+      {
+        if (this.tracing) console.log("setVoiceSpeed(" + el.id + ")");
+
+        this.voicespeed = el.value;
+        this.saveElementStateToLocalStorage(el);
+      }
+
+      setVoiceType(el)  
+      {
+        if (this.tracing) console.log("setVoiceType(" + el.id + ")");
+
+        let opt;
+        for ( let i = 0; i < el.options.length; i++ ) {
+            opt = el.options[i];
+            // console.log(opt);
+            if ( opt.selected === true ) {
+                break;
+            }
+        }
+
+        this.active_voice = this.available_voices[opt.getAttribute("data-voicenum")];
+        this.active_lang = this.active_voice.lang;
+
+        this.saveElementStateToLocalStorage(el);
+ 
+      } // setVoiceType()
+
+      setVoiceVolume(el)  
+      {
+        if (this.tracing) console.log("setVoiceVolume(" + el.id + ")");
+
+        this.voicevolume = el.value;
+        this.saveElementStateToLocalStorage(el);
+      }
+      
+      showRoundScoresInGameTable() 
+      {
+        if (this.tracing) console.log("showRoundScoresInGameTable()");
+
+        this.inp_roundstartingdouble.focus();
+
+        this.btn_roundnum.disabled = false;
+        let trow, tcell;
+        let rounds = this.ar_roundshistory.length;
+        
+        trow = this.gamescorestable.insertRow(-1);
+
+        for(let p = 0; p < this.ar_roundshistory[this.roundshistoryindex].length - 1; p++)
+        {
+          tcell = trow.insertCell(p);
+          tcell.innerText = this.ar_roundshistory[this.roundshistoryindex][p];
+        }
+        //add the round number in the last cell
+        tcell = trow.insertCell(4);
+        tcell.innerText = this.roundnum;
+
+        this.initializePlayerGameTotals();
+        
+        for (let r = 0; r < rounds; r++)
+        {
+          for (let s = 0; s < this.ar_playergametotals.length; s++)
+          {
+            this.ar_playergametotals[s] += Number(this.ar_roundshistory[r][s]);
+          }
+        }
+
+        this.gameover = false;
+        let winner, loser = "";
+        let score, loserscore = 0;
+        let winningscore = 99999;
+        trow = this.gamescorestable.rows[0];
+        for (let t = 0; t < this.playercount; t++)
+        {
+          tcell = trow.cells[t];
+          score = this.ar_playergametotals[t];
+          tcell.innerText = score;
+          this.textToSpeech(this.ar_playerbuttons[t].value + " has " + score);
+          if (this.ar_playergametotals[t] >= Number(this.sel_gamelimit.value)) this.gameover = true;
+          if (score > loserscore) 
+          {
+            loserscore = score;
+            loser = this.ar_playerbuttons[t].value;
+          }
+          if (score < winningscore) 
+          {
+            winningscore = score;
+            winner = this.ar_playerbuttons[t].value;
+          }
+        }
+        this.ar_playerinputs[0].focus();
+        if (this.gameover == true)
+        {
+          let phrasenum = Math.floor(Math.random() * this.loserphrase.length);
+          let phrase = "GAME OVER the HAPPY WINNER is: " + winner + " with " + winningscore;
+          phrase += " and the ";
+          phrase += this.loserphrase[0] + " is: " + loser + " with " + loserscore;
+          phrase += " the " + this.loserphrase[phrasenum] + loser;
+          switch (loser)
+          {
+            case "Tobie" : phrase += this.tobieloserphrases[0]; break;
+            case "Robbie" : phrase += this.robbieloserphrases[0]; break;
+            case "David" : phrase += this.davidloserphrases[0]; break;
+            case "Richard" : phrase += this.richardloserphrases[0]; break;
+          }
+          phrase += " but Hey ";
+          phrase += winner + this.winnerphrase[phrasenum];
+          switch (winner)
+          {
+            case "Tobie" : phrase += this.tobiewinnerphrases[0]; break;
+            case "Robbie" : phrase += this.robbiewinnerphrases[0]; break;
+            case "David" : phrase += this.davidwinnerphrases[0]; break;
+            case "Richard" : phrase += this.richardwinnerphrases[0]; break;
+          }
+
+          this.textToSpeech(phrase , "startNewGame");
+          return
+        }
+        // if (confirm("Start New Round?")) this.startNewRound();
+        this.startNewRound();
+
+      } // showRoundScoresInGameTable()
+
+      startNewGame() 
+      {
+        if (this.tracing) console.log("startNewGame()");
+
+        if (this.sel_gamelimit.value < 1)
+        {
+          alert("Please select a game limit");
+          this.sel_gamelimit.focus();
+        }
+        this.initializeGameScoresTable();
+        this.roundnum = 0;
+        this.span_roundnum.innerText = this.roundnum;
+        this.ar_roundshistory = [];
+        this.startNewRound();
+      }
+
+      startNewRound() 
+      {
+        if (this.tracing) console.log("startNewRound()");
+
+        // if (!confirm("Start NEW Round?")) return false;
+        // this.btn_roundnum.disabled = true;
+        this.roundnum = Number(this.span_roundnum.innerText) + 1;
+        this.span_roundnum.innerText = this.roundnum;
+        this.roundshistoryindex = this.roundnum - 1;
+        this.addRowToRoundsHistory();
+        this.textToSpeech("Round " + this.roundnum, "promptForStartingDouble");
+        this.inp_scannedtext.value = "";
+        this.inp_scannedtotal.value = "";
+        this.ar_tilesused = [];
+        this.roundgrandtotal = 0;
+        for (let t = 0; t < this.playercount; t++)
+        {
+          this.ar_playerinputs[t].value = "";
+          this.ar_playerroundtotalsinputs[t].value = 0;
+        }
+        
+        // this.ar_playerinputs[0].focus();
+      } // startNewRound()
+      
+      textToSpeech = (phrase, optionalfunction = 9999) =>
+      {
+        if (this.tracing) console.log("textToSpeech()");
+
+        // console.log(this.active_voice);
+
+        // if (!this.active_voice) return;
+
+        // new SpeechSynthesisUtterance object
+        this.utter = new SpeechSynthesisUtterance();
+        this.utter.rate = this.voicespeed;
+        this.utter.pitch = this.voicepitch;
+        this.utter.volume = this.voicevolume;
+        this.utter.text = phrase;
+
+        // console.log("this.active_voice.length", this.active_voice.length);
+        // if (this.active_voice)
+        // {
+        //   this.utter.voice = this.active_voice;
+        // }
+        // console.log("this.active_lang.length", this.active_lang.length);
+        // if (this.active_lang)
+        // {
+        //   this.utter.lang = this.active_lang;
+        // }
+
+        console.log(this.utter);
+
+        if (optionalfunction != 9999)
+        {
+          this.utter.onend = optionalfunction;
+        }
+        
+        // speak
+        // console.log(this.utter);
+        this.synth.speak(this.utter);
+      } // end textToSpeech()
+      
+    } // end abzgame class
+
+    /*|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|
+    GLOBALS follow:
+    -|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|*/
+
+    function consoleLogObject(obj, objname="no name sent")
+    {
+      console.log("\n" + objname + "\n" + JSON.stringify(obj) + "\n");
+    }
+
+    var abzgamehaslocalstorage = false;
+    var checkIfLocalStorageExists = () =>
+    {
+      localStorage.setItem("abzgameusername", "richard");
+      if (localStorage.getItem("abzgameusername") == "richard")
+      {
+        abzgamehaslocalstorage = true;
+        // alert("we have localstorage");
+      }
+    }
+    checkIfLocalStorageExists();
+
+    if (!window.abzgame)
+    {
+      window.abzgame = new ABZD1129Game();
+    }
+
+    window.abzgame.startNewGame();
+
+    window.scancount = 0;
+    window.scanvalue = "";
+    window.ar_scanvalue = [];
+    window.scanresult = "";
+
+    consoleLogObject(window.abzgame, "abzgame");
+
+
+    console.log(document.activeElement);
+
+    window.addEventListener("keydown", function(evt) 
+    {
+      let kp = evt.which || evt.keyCode;
+      window.scancount ++;
+      if (kp != 13 && kp !=16 && kp != 186)
+      {
+        window.scanvalue += String.fromCharCode(kp);
+        window.ar_scanvalue.push(scanvalue);
+        // console.log(window.ar_scanvalue);
+      }
+      // console.log("you pressed the " + kp + " key " + window.scancount + " = " + window.scanvalue);
+      if (kp == 13) // we're done scanning
+      {
+        let playernumwithfocus = 999;
+        // let x = document.activeElement.tagName.getAttribute("NAME");
+        // console.log(x + " has focus");
+        // for (let i = 0; i < window.abzgame.playercount; i++)
+        // {
+          // if (window.abzgame.ar_playerinputs[i].hasFocus()) 
+          // {
+          //   playernumwithfocus = i;
+          // }
+        // }
+        window.scanresult = window.ar_scanvalue[window.ar_scanvalue.length - 1];
+        switch(window.scanresult) 
+        {
+          case "PLAYER1": 
+          {
+            window.abzgame.ar_playerinputs[0].focus();
+            break;
+          }
+          case "PLAYER2": 
+          {
+            window.abzgame.ar_playerinputs[1].focus();
+            break;
+          }          
+          case "PLAYER3": 
+          {
+            window.abzgame.ar_playerinputs[2].focus();
+            break;
+          }          
+          case "PLAYER4": 
+          {
+            window.abzgame.ar_playerinputs[3].focus();
+            break;
+          }          
+          case "PLAYER5": 
+          {
+            window.abzgame.ar_playerinputs[4].focus();
+            break;
+          }          
+          case "PLAYER6": 
+          {
+            window.abzgame.ar_playerinputs[5].focus();
+            break;
+          }
+          default: // code block
+            break;
+        }
+        // console.log(window.scanresult + " original playernumwithfocus == " + playernumwithfocus);
+      }
+
+      if (kp == 16) 
+      {
+        // console.log("we might be scanning");
+        evt.preventDefault();
+        // return true;
+      }
+      if (kp = 186) 
+      {
+        // console.log("we are definitely scanning");
+        // return true;
+      }
+      if (kp = 13) 
+      {
+        // console.log("we are DONE scanning");
+        // console.log("now see if scan was a player# or a tile " + window.scanresult + " otherwise REJECT the scan value.");
+        // return true;
+      }
+    });
+
+    console.log(document.activeElement);
+
+    if (document.activeElement.tagName != "INPUT")
+    {
+      window.abzgame.inp_roundstartingdouble.focus();
+    }
+
+    console.log(document.activeElement);
+
+    const ele = window.abzgame.inp_roundstartingdouble;
+    const hasFocus = ele => (ele === document.activeElement);
+
+    console.log(hasFocus());
+
+    const prefixWithZeros = (number, length) => String(number).padStart(length, '0');
+
+    console.log(prefixWithZeros(42, 3)); // === '00042'
+    
+    </script>
+  </body>
+</html>
